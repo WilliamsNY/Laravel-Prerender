@@ -1,7 +1,6 @@
-<?php namespace Nutsweb\LaravelPrerender;
+<?php
+namespace Nutsweb\LaravelPrerender;
 
-use App;
-use GuzzleHttp\Client;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +14,7 @@ class LaravelPrerenderServiceProvider extends ServiceProvider
      */
     protected $defer = false;
 
-    protected $package = 'nutsweb/laravel-prerender';
+    protected $package = 'ahtinurme/laravel-prerender';
 
     /**
      * Bootstrap the application events.
@@ -28,10 +27,10 @@ class LaravelPrerenderServiceProvider extends ServiceProvider
             __DIR__ . '/../config/prerender.php' => config_path('prerender.php')
         ], 'config');
 
-        if ($this->app['config']->get('prerender.enable')) {
+        if (config('prerender.enable')) {
             /** @var Kernel $kernel */
-            $kernel = $this->app['Illuminate\Contracts\Http\Kernel'];
-            $kernel->pushMiddleware(PrerenderMiddleware::class);
+            $appKernel = resolve(\App\Http\Kernel::class);
+            $appKernel->pushMiddleware(PrerenderMiddleware::class);
         }
     }
 
