@@ -1,12 +1,9 @@
 <?php
 
-
 namespace Nutsweb\LaravelPrerender;
-
 
 use Closure;
 use Illuminate\Support\Str;
-use Redirect;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Foundation\Application;
 use GuzzleHttp\Client as Guzzle;
@@ -120,7 +117,7 @@ class PrerenderMiddleware
 
                 if (!$this->returnSoftHttpCodes && $statusCode >= 300 && $statusCode < 400) {
                     $headers = $prerenderedResponse->getHeaders();
-                    return Redirect::to(array_change_key_case($headers, CASE_LOWER)["location"][0], $statusCode);
+                    return redirect(array_change_key_case($headers, CASE_LOWER)["location"][0], $statusCode);
                 }
 
                 return $this->buildSymfonyResponseFromGuzzleResponse($prerenderedResponse);
@@ -217,13 +214,13 @@ class PrerenderMiddleware
             $host = $request->getHost();
             $path = $request->Path();
             // Fix "//" 404 error
-            if ($path == "/") {
+            if ($path === "/") {
                 $path = "";
             }
             return $this->client->get($this->prerenderUri . '/' . urlencode($protocol . '://' . $host . '/' . $path), compact('headers'));
         } catch (RequestException $exception) {
             if (!$this->returnSoftHttpCodes && !empty($exception->getResponse()) && $exception->getResponse()->getStatusCode() == 404) {
-                \App::abort(404);
+                abort(404);
             }
             // In case of an exception, we only throw the exception if we are in debug mode. Otherwise,
             // we return null and the handle() method will just pass the request to the next middleware
